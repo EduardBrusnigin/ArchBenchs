@@ -57,7 +57,12 @@ int64_t partition(double* arr, int64_t left, int64_t right) {
 
 
 #define insertion_threshold (int64_t)64
-void quick_sort(double* arr, int64_t left, int64_t right, int64_t sequential_threshold) {
+void quick_sort(double* arr, int64_t left, int64_t right, int64_t max_threads) {
+	int64_t sequential_threshold = (right - left) / (32 * max_threads);
+
+	if (sequential_threshold < 10000)
+		sequential_threshold = 10000;
+
 	if (left < right) {
 		if ((right - left) < insertion_threshold) {
             insertion_sort(arr, left, right);
@@ -94,13 +99,11 @@ void quick_sort(double* arr, int64_t left, int64_t right, int64_t sequential_thr
 
 
 void parallel_quick_sort(double* arr, int64_t size) {
-	const int64_t sequential_threshold = size / (16 * omp_get_max_threads());
-
 	#pragma omp parallel
 	{
 		#pragma omp single
 		{
-			quick_sort(arr, 0, size - 1, sequential_threshold);
+			quick_sort(arr, 0, size - 1, omp_get_max_threads());
 		}
 	}
 }
