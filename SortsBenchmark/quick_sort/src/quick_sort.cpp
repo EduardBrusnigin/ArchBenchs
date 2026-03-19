@@ -58,7 +58,7 @@ int64_t partition(double* arr, int64_t left, int64_t right) {
 
 #define insertion_threshold (int64_t)64
 void quick_sort(double* arr, int64_t left, int64_t right, int64_t max_threads) {
-	int64_t sequential_threshold = (right - left) / (32 * max_threads);
+	int64_t sequential_threshold = (right - left) / (48 * max_threads);
 
 	if (sequential_threshold < 10000)
 		sequential_threshold = 10000;
@@ -74,12 +74,12 @@ void quick_sort(double* arr, int64_t left, int64_t right, int64_t max_threads) {
 				int64_t partition_index = partition(arr, left, right);
 
 				if (partition_index - left < right - partition_index) {
-					quick_sort(arr, left, partition_index, sequential_threshold);
+					quick_sort(arr, left, partition_index, max_threads);
 					left = partition_index + 1;
 				}
 
 				else {
-					quick_sort(arr, partition_index + 1, right, sequential_threshold);
+					quick_sort(arr, partition_index + 1, right, max_threads);
 					right = partition_index;
 				}
 			}
@@ -89,10 +89,10 @@ void quick_sort(double* arr, int64_t left, int64_t right, int64_t max_threads) {
 			int64_t partition_index = partition(arr, left, right);
 
 			#pragma omp task
-			quick_sort(arr, left, partition_index, sequential_threshold);
+			quick_sort(arr, left, partition_index, max_threads);
 
 			#pragma omp task
-			quick_sort(arr, partition_index + 1, right, sequential_threshold);
+			quick_sort(arr, partition_index + 1, right, max_threads);
 		}
 	}
 }
