@@ -1,6 +1,9 @@
 #include <algorithm>
 #include <omp.h>
 
+// порог, с которого начинает запускаться сортировка вставками
+#define INSERTION_THRESHOLD (int64_t)128
+
 
 void insertion_sort(double* arr, int64_t left, int64_t right) {
     for (int i = left + 1; i <= right; i++) {
@@ -52,12 +55,11 @@ int64_t partition(double* arr, int64_t left, int64_t right) {
 }
 
 
-#define insertion_threshold (int64_t)128
 void quick_sort(double* arr, int64_t left, int64_t right) {
 	if (left >= right) 
 		return;
 	
-	if ((right - left) < insertion_threshold) {
+	if ((right - left) < INSERTION_THRESHOLD) {
         insertion_sort(arr, left, right);
         return;
     }
